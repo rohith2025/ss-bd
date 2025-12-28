@@ -1,14 +1,14 @@
 import express from "express";
-import {
-  createTimetable,
-  getTimetable,
-} from "../controllers/timetableController.js";
 import auth from "../middleware/authMiddleware.js";
 import role from "../middleware/roleMiddleware.js";
+import {
+  createTimetable,
+  getStudentTimetable,
+} from "../controllers/timetableController.js";
 
 const router = express.Router();
 
 router.post("/", auth, role("hod"), createTimetable);
-router.get("/", auth, getTimetable);
+router.get("/my", auth, role("student"), getStudentTimetable);
 
 export default router;

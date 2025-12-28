@@ -2,13 +2,29 @@ import mongoose from "mongoose";
 
 const notificationSchema = new mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+    title: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
-    message: String,
-    read: { type: Boolean, default: false },
+    message: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    type: {
+      type: String,
+      enum: ["attendance", "exam", "fee", "leave", "general"],
+      default: "general",
+    },
+
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", 
+      required: true,
+    },
   },
   { timestamps: true }
 );

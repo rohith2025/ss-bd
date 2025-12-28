@@ -1,9 +1,17 @@
 import express from "express";
-import { getNotifications } from "../controllers/notificationController.js";
 import auth from "../middleware/authMiddleware.js";
+import role from "../middleware/roleMiddleware.js";
+import {
+  createNotification,
+  getAllNotifications,
+} from "../controllers/notificationController.js";
 
 const router = express.Router();
 
-router.get("/", auth, getNotifications);
+
+router.post("/", auth, role("admin"), createNotification);
+
+
+router.get("/", auth, getAllNotifications);
 
 export default router;

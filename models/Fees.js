@@ -1,20 +1,35 @@
 import mongoose from "mongoose";
 
+const semesterSchema = {
+  paid: {
+    type: Boolean,
+    default: false,
+  },
+  amount: {
+    type: Number,
+    required: true,
+  },
+};
+
 const feesSchema = new mongoose.Schema(
   {
     student: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
+      unique: true,
     },
 
-    type: {
-      type: String,
-      enum: ["academic", "hostel", "transport", "other"],
+    semesters: {
+      sem1: semesterSchema,
+      sem2: semesterSchema,
+      sem3: semesterSchema,
+      sem4: semesterSchema,
+      sem5: semesterSchema,
+      sem6: semesterSchema,
+      sem7: semesterSchema,
+      sem8: semesterSchema,
     },
-
-    amount: Number,
-    dueDate: Date,
-    paid: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

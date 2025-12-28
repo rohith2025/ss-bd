@@ -2,22 +2,38 @@ import mongoose from "mongoose";
 
 const timetableSchema = new mongoose.Schema(
   {
-    branch: String,
-    year: String,
-    semester: String,
-    section: String,
+    branch: {
+      type: String,
+      required: true,
+    },
 
-    day: String,
+    year: {
+      type: Number,
+      required: true,
+      enum: [1, 2, 3, 4],
+    },
+
+    section: {
+      type: String,
+      required: true,
+    },
 
     periods: [
       {
-        subject: String,
-        faculty: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
+        day: {
+          type: String,
+          required: true,
         },
-        startTime: String,
-        endTime: String,
+        slots: [
+          {
+            subject: String,
+            teacher: {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: "User",
+            },
+            time: String,
+          },
+        ],
       },
     ],
   },

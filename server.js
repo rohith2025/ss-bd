@@ -17,6 +17,8 @@ import thesisRoutes from "./routes/thesisRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
 import activitiesRoutes from "./routes/activitiesRoutes.js";
 import timetableRoutes from "./routes/timetableRoutes.js";
+import leaveRoutes from "./routes/leaveRoutes.js";
+
 
 dotenv.config();
 connectDB();
@@ -31,14 +33,15 @@ app.use("/api/teacher", teacherRoutes);
 app.use("/api/parent", parentRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/exams", examRoutes);
-app.use("/api/fees", feesRoutes);
-app.use("/api/notifications", notificationRoutes);
+app.use("/api/fees", feesRoutes); 
+app.use("/api/notifications", notificationRoutes); 
 app.use("/api/notices", noticeRoutes);
 app.use("/api/holidays", holidayRoutes);
 app.use("/api/thesis", thesisRoutes);
-app.use("/api/transactions", transactionRoutes);
+app.use("/api/transactions", transactionRoutes); // to be changed 
 app.use("/api/activities", activitiesRoutes);
 app.use("/api/timetable", timetableRoutes);
+app.use("/api/leaves", leaveRoutes); // to be checked 
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
