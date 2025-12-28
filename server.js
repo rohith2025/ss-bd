@@ -41,7 +41,7 @@ app.use("/api/thesis", thesisRoutes);
 app.use("/api/transactions", transactionRoutes); // to be changed 
 app.use("/api/activities", activitiesRoutes);
 app.use("/api/timetable", timetableRoutes);
-app.use("/api/leaves", leaveRoutes); // to be checked 
+app.use("/api/leaves", leaveRoutes); 
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
