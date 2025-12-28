@@ -4,7 +4,6 @@ import User from "../models/User.js";
 const authMiddleware = async (req, res, next) => {
   let token;
 
-  // Token should be: Authorization: Bearer <token>
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
@@ -32,4 +31,3 @@ const authMiddleware = async (req, res, next) => {
 export default authMiddleware;
 
 
-// should verify this code
