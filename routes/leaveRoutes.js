@@ -6,6 +6,8 @@ import {
   parentAction,
   hodAction,
   getStudentLeaves, 
+  getParentLeaves,
+  getHodLeaves,
 } from "../controllers/leaveController.js";
 
 const router = express.Router();
@@ -17,5 +19,10 @@ router.get("/my", auth, role("student"), getStudentLeaves);
 router.put("/parent/:leaveId", auth, role("parent"), parentAction);
 
 router.put("/hod/:leaveId", auth, role("hod"), hodAction);
+
+router.get("/parent", auth, role("parent"), getParentLeaves);
+
+router.get("/hod", auth, role("hod"), getHodLeaves);
+
 
 export default router;

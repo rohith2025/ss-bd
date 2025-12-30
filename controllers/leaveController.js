@@ -108,3 +108,34 @@ export const getStudentLeaves = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getParentLeaves = async (req, res) => {
+  try {
+    const leaves = await LeaveRequest.find({
+      parent: req.user.id,
+    })
+      .sort({ createdAt: -1 })
+      .populate("student", "name email");
+
+    res.json(leaves);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getHodLeaves = async (req, res) => {
+  try {
+    const leaves = await LeaveRequest.find({
+      hod: req.user.id,
+      parentStatus: "approved",
+      hodStatus: "pending",
+    })
+      .sort({ createdAt: -1 })
+      .populate("student", "name email")
+      .populate("parent", "name email");
+
+    res.json(leaves);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
