@@ -20,6 +20,8 @@ import transactionRoutes from "./routes/transactionRoutes.js";
 import activitiesRoutes from "./routes/activitiesRoutes.js";
 import timetableRoutes from "./routes/timetableRoutes.js";
 import leaveRoutes from "./routes/leaveRoutes.js";
+import gradesRoutes from "./routes/gradesRoutes.js";
+import examHeadRoutes from "./routes/examHeadRoutes.js";
 
 
 dotenv.config();
@@ -49,9 +51,11 @@ app.use("/api/thesis", thesisRoutes);
 app.use("/api/transactions", transactionRoutes); // to be changed 
 app.use("/api/activities", activitiesRoutes);
 app.use("/api/timetable", timetableRoutes);
-app.use("/api/leaves", leaveRoutes); 
+app.use("/api/leaves", leaveRoutes);
+app.use("/api/grades", gradesRoutes);
+app.use("/api/exam-head", examHeadRoutes); 
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
   console.log(`Server running on port ${PORT}`)
-);
+)

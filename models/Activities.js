@@ -12,6 +12,15 @@ const activitiesSchema = new mongoose.Schema(
     description: String,
     date: Date,
     certificateUrl: String,
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
+    approvedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   { timestamps: true }
 );
