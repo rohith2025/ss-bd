@@ -16,7 +16,7 @@ router.get("/activities/pending", auth, role("exam_head"), getPendingActivities)
 router.get("/student/:studentId", auth, role("exam_head"), getStudentProfile);
 
 // Get all linked students
-router.get("/students", auth, role("exam_head"), getLinkedStudents);
+router.get("/students", auth, role("exam_head","hod"), getLinkedStudents);
 
 export default router;
 

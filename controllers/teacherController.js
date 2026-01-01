@@ -5,17 +5,21 @@ import Activities from "../models/Activities.js";
 import Grades from "../models/Grades.js";
 import Thesis from "../models/Thesis.js";
 
-
+/* ===========================
+   MARK ATTENDANCE (TEACHER ONLY)
+=========================== */
 export const markAttendance = async (req, res) => {
   try {
-    const teacherId = req.user._id; 
+    const teacherId = req.user._id;
     const { studentId, subject, status, day, time } = req.body;
 
     if (!studentId || !subject || !status || !day || !time) {
-      return res.status(400).json({
-        message:
-          "Missing required fields: studentId, subject, status, day, time",
-      });
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // ❌ HOD NOT ALLOWED
+    if (!["teacher", "lab_assistant"].includes(req.user.role)) {
+      return res.status(403).json({ message: "Only teachers can mark attendance" });
     }
 
     const link = await UserLink.findOne({
@@ -24,9 +28,7 @@ export const markAttendance = async (req, res) => {
     });
 
     if (!link) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to mark attendance" });
+      return res.status(403).json({ message: "Not authorized" });
     }
 
     const attendance = await Attendance.create({
@@ -38,97 +40,115 @@ export const markAttendance = async (req, res) => {
       time,
     });
 
-    res.status(201).json({
-      message: "Attendance marked successfully",
-      attendance,
-    });
+    res.status(201).json({ message: "Attendance marked", attendance });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
   }
 };
 
-
+/* ===========================
+   TEACHER / HOD DASHBOARD
+=========================== */
 export const getTeacherDashboard = async (req, res) => {
   try {
-    const teacherId = req.user._id;
+    const userId = req.user._id;
+    const role = req.user.role;
 
-    const teacher = await User.findById(teacherId).select("name subjects");
+    const user = await User.findById(userId).select(
+      "name subjects role managedBranch"
+    );
 
-    const linkedStudentsLinks = await UserLink.find({ teachers: teacherId })
-      .populate({ path: "student", select: "name" });
+    let students = [];
 
-    const studentsWithAttendance = [];
+    /* ================= HOD LOGIC (FIXED) ================= */
+    if (role === "hod") {
+      if (!user.managedBranch) {
+        return res.json({ teacher: user, students: [] });
+      }
 
-    for (const link of linkedStudentsLinks) {
-      const student = link.student;
-      if (!student) continue;
+      // ✅ Fetch students by branch (NOT only UserLink.hod)
+      const branchStudents = await User.find({
+        role: "student",
+        branch: user.managedBranch,
+      }).select("name");
 
-      const attendanceRecords = await Attendance.find({
-        student: student._id,
-      }).sort({ date: 1 });
-
-      const attendance = attendanceRecords.map((record) => ({
-        status: record.status,
-        subject: record.subject,
-        day: record.day,
-        time: record.time,
-        date: record.date,
+      students = branchStudents.map((s) => ({
+        _id: s._id,
+        studentName: s.name,
+        attendance: [],
       }));
-
-
-      studentsWithAttendance.push({
-        _id: student._id,         
-        studentName: student.name, 
-        attendance,
-      });
     }
 
-    res.json({
-      teacher,
-      students: studentsWithAttendance,
-    });
+    /* ================= TEACHER LOGIC (UNCHANGED) ================= */
+    else {
+      const links = await UserLink.find({ teachers: userId })
+        .populate({ path: "student", select: "name" });
+
+      for (const link of links) {
+        if (!link.student) continue;
+
+        const attendanceRecords = await Attendance.find({
+          student: link.student._id,
+        }).sort({ createdAt: 1 });
+
+        students.push({
+          _id: link.student._id,
+          studentName: link.student.name,
+          attendance: attendanceRecords.map((a) => ({
+            subject: a.subject,
+            status: a.status,
+            day: a.day,
+            time: a.time,
+            date: a.createdAt,
+          })),
+        });
+      }
+    }
+
+    res.json({ teacher: user, students });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Failed to fetch teacher dashboard" });
+    res.status(500).json({ message: "Failed to fetch dashboard" });
   }
 };
 
-// Get complete student profile (attendance, activities, grades, thesis, parent details)
+/* ===========================
+   STUDENT FULL PROFILE
+   (TEACHER + HOD)
+=========================== */
 export const getStudentProfile = async (req, res) => {
   try {
     const { studentId } = req.params;
-    const teacherId = req.user._id;
+    const user = req.user;
 
-    // Verify teacher is linked to this student
-    const userLink = await UserLink.findOne({
-      student: studentId,
-      teachers: teacherId,
-    })
-      .populate("student", "name email branch year section batch")
-      .populate("parent", "name email phone")
-      .populate("teachers", "name email")
-      .populate("hod", "name email");
+    let authorized = false;
 
-    if (!userLink) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to view this student's profile" });
+    if (user.role === "hod") {
+      const hod = await User.findById(user._id).select("managedBranch");
+      const student = await User.findById(studentId).select("branch");
+
+      authorized = student && hod.managedBranch === student.branch;
+    } else {
+      const link = await UserLink.findOne({
+        student: studentId,
+        teachers: user._id,
+      });
+      authorized = !!link;
     }
 
-    // Fetch student data: attendance, activities (approved only), grades, thesis
+    if (!authorized) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
     const [attendance, activities, grades, thesis] = await Promise.all([
-      Attendance.find({ student: studentId }).sort({ date: -1 }),
-      Activities.find({ student: studentId, status: "approved" })
-        .populate("approvedBy", "name email")
-        .sort({ createdAt: -1 }),
+      Attendance.find({ student: studentId }).sort({ createdAt: -1 }),
+      Activities.find({ student: studentId }).sort({ createdAt: -1 }),
       Grades.findOne({ student: studentId }),
       Thesis.find({ student: studentId }).sort({ createdAt: -1 }),
     ]);
 
     res.json({
-      student: userLink.student,
-      parent: userLink.parent,
       attendance,
       activities,
       grades,
