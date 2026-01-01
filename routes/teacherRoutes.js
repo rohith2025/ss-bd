@@ -7,6 +7,6 @@ const router = express.Router();
 
 router.post("/attendance", auth, role("teacher", "hod"), markAttendance);
 
-router.get("/dashboard", auth, role("teacher", "hod"), getTeacherDashboard);
+router.get("/dashboard", auth, role("teacher", "hod",), getTeacherDashboard);
 
 export default router;

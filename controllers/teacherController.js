@@ -61,9 +61,11 @@ export const getTeacherDashboard = async (req, res) => {
       const student = link.student;
       if (!student) continue;
 
-      const attendanceRecords = await Attendance.find({ student: student._id }).sort({ date: 1 });
+      const attendanceRecords = await Attendance.find({
+        student: student._id,
+      }).sort({ date: 1 });
 
-      const attendance = attendanceRecords.map(record => ({
+      const attendance = attendanceRecords.map((record) => ({
         status: record.status,
         subject: record.subject,
         day: record.day,
@@ -71,8 +73,10 @@ export const getTeacherDashboard = async (req, res) => {
         date: record.date,
       }));
 
+
       studentsWithAttendance.push({
-        studentName: student.name,
+        _id: student._id,         
+        studentName: student.name, 
         attendance,
       });
     }

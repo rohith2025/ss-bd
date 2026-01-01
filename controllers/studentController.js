@@ -6,7 +6,7 @@ import UserLink from "../models/UserLink.js";
 export const getStudentDashboard = async (req, res) => {
   try {
     const student = await User.findById(req.user._id).select(
-      "name email year semester branch batch"
+      "name email year semester branch batch section"
     );
 
     if (!student) {
