@@ -20,3 +20,6 @@ router.get("/child/:studentId", auth, role("parent"), getChildGrades);
 
 export default router;
 
+
+
+

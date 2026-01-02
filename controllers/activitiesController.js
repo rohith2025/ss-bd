@@ -18,8 +18,9 @@ export const addActivity = async (req, res) => {
 };
 
 // Get activities with visibility rules:
-// - Approved: visible to everyone
-// - Pending/Rejected: visible only to student & exam_head
+// - Student: sees all own activities
+// - Exam Head: sees all activities of ALL linked students (pending/approved/rejected)
+// - Others: only see approved activities
 export const getActivities = async (req, res) => {
   try {
     const { studentId } = req.query;
@@ -34,23 +35,41 @@ export const getActivities = async (req, res) => {
         .populate("approvedBy", "name email")
         .sort({ createdAt: -1 });
     } else if (userRole === "exam_head") {
-      // Exam head can see all activities for their linked students
-      const userLink = await UserLink.findOne({ examHead: userId });
-      if (userLink && userLink.student.toString() === studentId) {
-        activities = await Activities.find({ student: studentId })
-          .populate("approvedBy", "name email")
-          .sort({ createdAt: -1 });
-      } else {
-        // Only show approved activities for other students
-        activities = await Activities.find({
+      // Exam head can see all activities for ALL their linked students
+      if (studentId) {
+        // If specific studentId provided, verify link and show all activities
+        const userLink = await UserLink.findOne({
+          examHead: userId,
           student: studentId,
-          status: "approved",
-        })
+        });
+        if (userLink) {
+          activities = await Activities.find({ student: studentId })
+            .populate("approvedBy", "name email")
+            .populate("student", "name email branch year section")
+            .sort({ createdAt: -1 });
+        } else {
+          // Not linked, only show approved
+          activities = await Activities.find({
+            student: studentId,
+            status: "approved",
+          })
+            .populate("approvedBy", "name email")
+            .sort({ createdAt: -1 });
+        }
+      } else {
+        // No studentId - get all activities of all linked students
+        const userLinks = await UserLink.find({ examHead: userId });
+        const studentIds = userLinks.map((link) => link.student);
+        activities = await Activities.find({ student: { $in: studentIds } })
           .populate("approvedBy", "name email")
+          .populate("student", "name email branch year section")
           .sort({ createdAt: -1 });
       }
     } else {
       // Others (parent, teacher, etc.) - only see approved
+      if (!studentId) {
+        return res.status(400).json({ message: "studentId is required" });
+      }
       activities = await Activities.find({
         student: studentId,
         status: "approved",

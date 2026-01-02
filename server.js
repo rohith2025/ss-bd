@@ -22,6 +22,7 @@ import timetableRoutes from "./routes/timetableRoutes.js";
 import leaveRoutes from "./routes/leaveRoutes.js";
 import gradesRoutes from "./routes/gradesRoutes.js";
 import examHeadRoutes from "./routes/examHeadRoutes.js";
+import hodRoutes from "./routes/hodRoutes.js";
 
 
 dotenv.config();
@@ -53,7 +54,8 @@ app.use("/api/activities", activitiesRoutes);
 app.use("/api/timetable", timetableRoutes);
 app.use("/api/leaves", leaveRoutes);
 app.use("/api/grades", gradesRoutes);
-app.use("/api/exam-head", examHeadRoutes); 
+app.use("/api/exam-head", examHeadRoutes);
+app.use("/api/hod", hodRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
