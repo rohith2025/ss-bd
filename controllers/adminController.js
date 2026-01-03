@@ -10,7 +10,6 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-// Get user links for a student (admin only)
 export const getUserLinks = async (req, res) => {
   try {
     const { studentId } = req.params;

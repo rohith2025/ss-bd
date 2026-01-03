@@ -40,12 +40,10 @@ export const getStudentAttendance = async (req, res) => {
   try {
     const { date } = req.query;
     
-    // Build query
     const query = {
       student: req.user.id,
     };
 
-    // If date is provided, filter by that date
     if (date) {
       const startOfDay = new Date(date);
       startOfDay.setHours(0, 0, 0, 0);

@@ -5,9 +5,6 @@ export const createExam = async (req, res) => {
   try {
     const examHead = await User.findById(req.user.id);
 
-    console.log("Exam Head Branch:", examHead.managedBranch);
-    console.log("Requested Exam Branch:", req.body.branch);
-
     if (examHead.managedBranch !== req.body.branch) {
       return res
         .status(403)
@@ -25,8 +22,6 @@ export const createExam = async (req, res) => {
 export const getStudentExams = async (req, res) => {
   try {
     const student = await User.findById(req.user.id);
-
-    console.log("Student Branch:", student.branch);
 
     const exams = await Exam.find({
       branch: student.branch,

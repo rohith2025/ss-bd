@@ -9,18 +9,15 @@ import Fees from "../models/Fees.js";
 import LeaveRequest from "../models/LeaveRequest.js";
 import Timetable from "../models/Timetable.js";
 
-// Get all pending activities for exam_head's linked students
 export const getPendingActivities = async (req, res) => {
   try {
     const examHeadId = req.user._id;
 
-    // Find all students linked to this exam_head
     const userLinks = await UserLink.find({ examHead: examHeadId })
       .populate("student", "name email branch year section");
 
     const studentIds = userLinks.map((link) => link.student._id);
 
-    // Get pending activities for these students
     const activities = await Activities.find({
       student: { $in: studentIds },
       status: "pending",
@@ -34,13 +31,11 @@ export const getPendingActivities = async (req, res) => {
   }
 };
 
-// Get complete student profile (for exam_head)
 export const getStudentProfile = async (req, res) => {
   try {
     const { studentId } = req.params;
     const examHeadId = req.user._id;
 
-    // Verify exam_head is linked to this student
     const userLink = await UserLink.findOne({
       student: studentId,
       examHead: examHeadId,
@@ -56,7 +51,6 @@ export const getStudentProfile = async (req, res) => {
         .json({ message: "Not authorized to view this student's profile" });
     }
 
-    // Fetch all student data
     const [attendance, activities, grades, thesis, exams, fees, leaves, timetable] =
       await Promise.all([
         Attendance.find({ student: studentId }).sort({ date: -1 }),
@@ -101,7 +95,6 @@ export const getStudentProfile = async (req, res) => {
   }
 };
 
-// Get all linked students for exam_head
 export const getLinkedStudents = async (req, res) => {
   try {
     const examHeadId = req.user._id;

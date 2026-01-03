@@ -9,7 +9,6 @@ import Fees from "../models/Fees.js";
 import LeaveRequest from "../models/LeaveRequest.js";
 import Timetable from "../models/Timetable.js";
 
-// Get all linked students for HOD
 export const getLinkedStudents = async (req, res) => {
   try {
     const hodId = req.user._id;
@@ -34,13 +33,11 @@ export const getLinkedStudents = async (req, res) => {
   }
 };
 
-// Get complete student profile (for HOD)
 export const getStudentProfile = async (req, res) => {
   try {
     const { studentId } = req.params;
     const hodId = req.user._id;
 
-    // Verify HOD is linked to this student
     const userLink = await UserLink.findOne({
       student: studentId,
       hod: hodId,
@@ -56,7 +53,6 @@ export const getStudentProfile = async (req, res) => {
         .json({ message: "Not authorized to view this student's profile" });
     }
 
-    // Fetch all student data
     const [attendance, activities, grades, thesis, exams, fees, leaves, timetable] =
       await Promise.all([
         Attendance.find({ student: studentId }).sort({ date: -1 }),

@@ -1,7 +1,6 @@
 import Grades from "../models/Grades.js";
 import UserLink from "../models/UserLink.js";
 
-// Exam head can add/update grades
 export const addOrUpdateGrades = async (req, res) => {
   try {
     const { studentId, semester, sgpa, cgpa } = req.body;
@@ -13,7 +12,6 @@ export const addOrUpdateGrades = async (req, res) => {
       });
     }
 
-    // Verify exam_head is linked to this student
     const userLink = await UserLink.findOne({
       student: studentId,
       examHead: examHeadId,
@@ -25,7 +23,6 @@ export const addOrUpdateGrades = async (req, res) => {
         .json({ message: "Not authorized to manage grades for this student" });
     }
 
-    // Update or create grades
     const grades = await Grades.findOneAndUpdate(
       { student: studentId },
       {
@@ -46,7 +43,6 @@ export const addOrUpdateGrades = async (req, res) => {
   }
 };
 
-// Students can view their own grades
 export const getStudentGrades = async (req, res) => {
   try {
     const studentId = req.user._id;
@@ -62,13 +58,11 @@ export const getStudentGrades = async (req, res) => {
   }
 };
 
-// Parents can view their child's grades
 export const getChildGrades = async (req, res) => {
   try {
     const { studentId } = req.params;
     const parentId = req.user._id;
 
-    // Verify parent is linked to this student
     const userLink = await UserLink.findOne({
       student: studentId,
       parent: parentId,

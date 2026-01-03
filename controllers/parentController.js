@@ -14,7 +14,6 @@ export const viewChildAttendance = async (req, res) => {
     const { studentId } = req.params;
     const parentId = req.user._id;
 
-    // Verify parent is linked to this student
     const userLink = await UserLink.findOne({
       student: studentId,
       parent: parentId,
@@ -33,13 +32,11 @@ export const viewChildAttendance = async (req, res) => {
   }
 };
 
-// Get full student profile (A-to-Z data) for parent
 export const getChildFullProfile = async (req, res) => {
   try {
     const { studentId } = req.params;
     const parentId = req.user._id;
 
-    // Verify parent is linked to this student
     const userLink = await UserLink.findOne({
       student: studentId,
       parent: parentId,
@@ -57,7 +54,6 @@ export const getChildFullProfile = async (req, res) => {
 
     const student = await User.findById(studentId);
 
-    // Fetch all student data: attendance, activities (approved only), exams, fees, leaves, grades, thesis, timetable
     const [attendance, activities, exams, fees, leaves, grades, thesis, timetable] =
       await Promise.all([
         Attendance.find({ student: studentId }).sort({ date: -1 }),
@@ -102,7 +98,6 @@ export const getChildFullProfile = async (req, res) => {
   }
 };
 
-// Get linked child for parent
 export const getLinkedChild = async (req, res) => {
   try {
     const parentId = req.user._id;

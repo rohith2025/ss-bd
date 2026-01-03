@@ -5,9 +5,7 @@ import Activities from "../models/Activities.js";
 import Grades from "../models/Grades.js";
 import Thesis from "../models/Thesis.js";
 
-/* ===========================
-   MARK ATTENDANCE (TEACHER ONLY)
-=========================== */
+
 export const markAttendance = async (req, res) => {
   try {
     const teacherId = req.user._id;
@@ -17,7 +15,6 @@ export const markAttendance = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // ❌ HOD NOT ALLOWED
     if (!["teacher", "lab_assistant"].includes(req.user.role)) {
       return res.status(403).json({ message: "Only teachers can mark attendance" });
     }
@@ -47,9 +44,7 @@ export const markAttendance = async (req, res) => {
   }
 };
 
-/* ===========================
-   TEACHER / HOD DASHBOARD
-=========================== */
+
 export const getTeacherDashboard = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -61,13 +56,11 @@ export const getTeacherDashboard = async (req, res) => {
 
     let students = [];
 
-    /* ================= HOD LOGIC (FIXED) ================= */
     if (role === "hod") {
       if (!user.managedBranch) {
         return res.json({ teacher: user, students: [] });
       }
 
-      // ✅ Fetch students by branch (NOT only UserLink.hod)
       const branchStudents = await User.find({
         role: "student",
         branch: user.managedBranch,
@@ -80,7 +73,6 @@ export const getTeacherDashboard = async (req, res) => {
       }));
     }
 
-    /* ================= TEACHER LOGIC (UNCHANGED) ================= */
     else {
       const links = await UserLink.find({ teachers: userId })
         .populate({ path: "student", select: "name" });
@@ -113,10 +105,7 @@ export const getTeacherDashboard = async (req, res) => {
   }
 };
 
-/* ===========================
-   STUDENT FULL PROFILE
-   (TEACHER + HOD)
-=========================== */
+
 export const getStudentProfile = async (req, res) => {
   try {
     const { studentId } = req.params;
