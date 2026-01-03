@@ -38,9 +38,29 @@ export const markAttendance = async (req, res) => {
 
 export const getStudentAttendance = async (req, res) => {
   try {
-    const attendance = await Attendance.find({
+    const { date } = req.query;
+    
+    // Build query
+    const query = {
       student: req.user.id,
-    }).populate("teacher", "name");
+    };
+
+    // If date is provided, filter by that date
+    if (date) {
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+      
+      query.date = {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      };
+    }
+
+    const attendance = await Attendance.find(query)
+      .populate("teacher", "name")
+      .sort({ date: -1 });
 
     res.json(attendance);
   } catch (error) {

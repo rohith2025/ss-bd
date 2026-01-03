@@ -2,11 +2,12 @@ import express from "express";
 import auth from "../middleware/authMiddleware.js";
 import role from "../middleware/roleMiddleware.js";
 import UserLink from "../models/UserLink.js";
-import { getAllUsers } from "../controllers/adminController.js";
+import { getAllUsers, getUserLinks } from "../controllers/adminController.js";
 
 const router = express.Router();
 
 router.get("/users", auth, role("admin"), getAllUsers);
+router.get("/user-links/:studentId", auth, role("admin"), getUserLinks);
 
 
 router.put("/link-user", auth, role("admin"), async (req, res) => {

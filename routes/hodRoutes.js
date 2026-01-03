@@ -17,3 +17,4 @@ router.get("/student/:studentId", auth, role("hod"), getStudentProfile);
 export default router;
 
 
+

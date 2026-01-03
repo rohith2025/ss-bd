@@ -1,9 +1,44 @@
 import User from "../models/User.js";
+import UserLink from "../models/UserLink.js";
 
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password");
     res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get user links for a student (admin only)
+export const getUserLinks = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    const userLink = await UserLink.findOne({ student: studentId })
+      .populate("student", "name email branch year section")
+      .populate("parent", "name email")
+      .populate("teachers", "name email")
+      .populate("hod", "name email")
+      .populate("examHead", "name email");
+
+    if (!userLink) {
+      return res.json({
+        student: null,
+        parent: null,
+        teachers: [],
+        hod: null,
+        examHead: null,
+      });
+    }
+
+    res.json({
+      student: userLink.student,
+      parent: userLink.parent,
+      teachers: userLink.teachers || [],
+      hod: userLink.hod,
+      examHead: userLink.examHead,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
