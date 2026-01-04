@@ -3,6 +3,7 @@ import {
   addOrUpdateGrades,
   getStudentGrades,
   getChildGrades,
+  migrateGradesData,
 } from "../controllers/gradesController.js";
 import auth from "../middleware/authMiddleware.js";
 import role from "../middleware/roleMiddleware.js";
@@ -18,7 +19,11 @@ router.get("/my", auth, role("student"), getStudentGrades);
 // Parents can view their child's grades
 router.get("/child/:studentId", auth, role("parent"), getChildGrades);
 
+// Admin can migrate grades data (temporary route)
+router.post("/migrate", auth, role("admin"), migrateGradesData);
+
 export default router;
+
 
 
 
