@@ -52,3 +52,19 @@ export const approveSemesterFee = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getStudentFees = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    let fees = await Fees.findOne({ student: studentId });
+
+    if (!fees) {
+      return res.status(404).json({ message: "Fees record not found" });
+    }
+
+    res.status(200).json(fees);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

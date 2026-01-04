@@ -4,6 +4,7 @@ import role from "../middleware/roleMiddleware.js";
 import {
   getMyFees,
   approveSemesterFee,
+  getStudentFees,
 } from "../controllers/feesController.js";
 
 const router = express.Router();
@@ -16,5 +17,7 @@ router.put(
   role("admin"),
   approveSemesterFee
 );
+router.get("/:studentId", auth, role("admin"), getStudentFees);
+
 
 export default router;
