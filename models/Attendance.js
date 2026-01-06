@@ -26,19 +26,35 @@ const attendanceSchema = new mongoose.Schema(
       required: true,
     },
 
-    day: {
-      type: String,
-      required: true, 
-    },
-
-    time: {
-      type: String,
-      required: true, 
-    },
-
     date: {
       type: Date,
-      default: Date.now,
+      required: true,
+    },
+
+    day: {
+      type: String,
+      required: true,
+    },
+
+    timeSlot: {
+      type: String,
+      required: true,
+    },
+
+    year: {
+      type: Number,
+      required: true,
+      enum: [1, 2, 3, 4],
+    },
+
+    section: {
+      type: String,
+      required: true,
+    },
+
+    branch: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }
