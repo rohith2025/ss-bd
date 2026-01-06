@@ -56,6 +56,7 @@ export const getTeacherDashboard = async (req, res) => {
 
     let students = [];
 
+    /* ===================== HOD ===================== */
     if (role === "hod") {
       if (!user.managedBranch) {
         return res.json({ teacher: user, students: [] });
@@ -64,18 +65,25 @@ export const getTeacherDashboard = async (req, res) => {
       const branchStudents = await User.find({
         role: "student",
         branch: user.managedBranch,
-      }).select("name");
+      }).select("name rollNo branch year section");
 
       students = branchStudents.map((s) => ({
         _id: s._id,
-        studentName: s.name,
+        name: s.name,
+        rollNo: s.rollNo,
+        branch: s.branch,
+        year: s.year,
+        section: s.section,
         attendance: [],
       }));
     }
 
+    /* ===================== TEACHER / OTHERS ===================== */
     else {
-      const links = await UserLink.find({ teachers: userId })
-        .populate({ path: "student", select: "name" });
+      const links = await UserLink.find({ teachers: userId }).populate({
+        path: "student",
+        select: "name rollNo branch year section",
+      });
 
       for (const link of links) {
         if (!link.student) continue;
@@ -86,7 +94,11 @@ export const getTeacherDashboard = async (req, res) => {
 
         students.push({
           _id: link.student._id,
-          studentName: link.student.name,
+          name: link.student.name,
+          rollNo: link.student.rollNo,
+          branch: link.student.branch,
+          year: link.student.year,
+          section: link.student.section,
           attendance: attendanceRecords.map((a) => ({
             subject: a.subject,
             status: a.status,
@@ -98,12 +110,16 @@ export const getTeacherDashboard = async (req, res) => {
       }
     }
 
-    res.json({ teacher: user, students });
+    res.json({
+      teacher: user,
+      students,
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Teacher Dashboard Error:", error);
     res.status(500).json({ message: "Failed to fetch dashboard" });
   }
 };
+
 
 
 export const getStudentProfile = async (req, res) => {
