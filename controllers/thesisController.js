@@ -41,3 +41,15 @@ export const getStudentThesis = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getMyThesis = async (req, res) => {
+  try {
+    const thesis = await Thesis.find({
+      student: req.user.id,
+    }).sort({ createdAt: -1 });
+
+    res.json(thesis);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
