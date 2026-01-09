@@ -46,14 +46,12 @@ const gradesSchema = new mongoose.Schema(
       max: 10,
     },
 
-    // Legacy fields for backward compatibility (will be removed after migration)
     semester: String,
     sgpa: Number,
   },
   { timestamps: true }
 );
 
-// Index for efficient queries
 gradesSchema.index({ student: 1 });
 
 export default mongoose.model("Grades", gradesSchema);

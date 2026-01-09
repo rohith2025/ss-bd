@@ -12,7 +12,6 @@ router.get(
   viewChildAttendance
 );
 
-// Get full student profile (A-to-Z data)
 router.get(
   "/child/:studentId/profile",
   auth,
@@ -20,7 +19,6 @@ router.get(
   getChildFullProfile
 );
 
-// Get linked child
 router.get(
   "/child",
   auth,

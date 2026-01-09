@@ -67,7 +67,6 @@ export const getStudentAttendance = async (req, res) => {
   }
 };
 
-// New timetable-driven attendance APIs
 export const getTeacherClasses = async (req, res) => {
   try {
     const { date } = req.query;
@@ -77,17 +76,14 @@ export const getTeacherClasses = async (req, res) => {
       return res.status(400).json({ message: "Date is required" });
     }
 
-    // Extract day name from date
     const dateObj = new Date(date);
     const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
 
-    // Find timetables that have this teacher assigned on this day
     const timetables = await Timetable.find({
       "periods.day": dayName,
       "periods.slots.teacher": teacherId,
     }).select("branch year section periods");
 
-    // Extract unique classes for this teacher on this day
     const classes = [];
     const seenClasses = new Set();
 
@@ -127,7 +123,6 @@ export const getClassStudents = async (req, res) => {
       return res.status(400).json({ message: "Year, section, and branch are required" });
     }
 
-    // Verify teacher has timetable slot for this class
     const timetable = await Timetable.findOne({
       branch,
       year: parseInt(year),
@@ -139,7 +134,6 @@ export const getClassStudents = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to access this class" });
     }
 
-    // Get students for this class
     const students = await User.find({
       role: "student",
       branch,
@@ -167,12 +161,10 @@ export const markBulkAttendance = async (req, res) => {
       attendance
     } = req.body;
 
-    // Validate required fields
     if (!date || !day || !subject || !year || !section || !timeSlot || !branch || !attendance) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Verify teacher has timetable slot for this class on this day
     const timetable = await Timetable.findOne({
       branch,
       year: parseInt(year),
@@ -189,7 +181,6 @@ export const markBulkAttendance = async (req, res) => {
       });
     }
 
-    // Check if attendance already exists for this date/subject/class
     const existingAttendance = await Attendance.findOne({
       teacher: teacherId,
       subject,

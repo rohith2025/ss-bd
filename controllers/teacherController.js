@@ -56,7 +56,6 @@ export const getTeacherDashboard = async (req, res) => {
 
     let students = [];
 
-    /* ===================== HOD ===================== */
     if (role === "hod") {
       if (!user.managedBranch) {
         return res.json({ teacher: user, students: [] });
@@ -78,7 +77,6 @@ export const getTeacherDashboard = async (req, res) => {
       }));
     }
 
-    /* ===================== TEACHER / OTHERS ===================== */
     else {
       const links = await UserLink.find({ teachers: userId }).populate({
         path: "student",

@@ -8,10 +8,8 @@ import role from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
-// Get all linked students
 router.get("/students", auth, role("hod"), getLinkedStudents);
 
-// Get complete student profile
 router.get("/student/:studentId", auth, role("hod"), getStudentProfile);
 
 export default router;

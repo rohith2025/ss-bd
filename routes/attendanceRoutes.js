@@ -11,10 +11,8 @@ import {
 
 const router = express.Router();
 
-// Legacy attendance API (keep for backward compatibility)
 router.post("/mark", auth, role("teacher"), markAttendance);
 
-// New timetable-driven attendance APIs
 router.get("/classes", auth, role("teacher", "lab_assistant"), getTeacherClasses);
 router.get("/class-students", auth, role("teacher", "lab_assistant"), getClassStudents);
 router.post("/", auth, role("teacher", "lab_assistant"), markBulkAttendance);
