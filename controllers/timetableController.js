@@ -194,3 +194,26 @@ export const getTeacherTimetable = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+export const getHodTimetables = async (req, res) => {
+  try {
+    const hod = await User.findById(req.user._id);
+
+    if (!hod.managedBranch) {
+      return res.status(403).json({
+        message: "HOD must have a managed branch",
+      });
+    }
+
+    const timetables = await Timetable.find({
+      branch: hod.managedBranch,
+    })
+      .sort({ year: 1, section: 1 })
+      .populate("periods.slots.teacher", "name");
+
+    res.json(timetables);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
